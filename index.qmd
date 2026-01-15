@@ -8,39 +8,37 @@ execute:
 # Hockey Data
 
 ```{r}
-#| echo: false
-#| message: false
-#| warning: false
+library(tidyverse)
 
-library(ggimage)
-library(ggplot2)
-library(dplyr)
+# 1. Create the data manually (simple & safe)
+mcdavid_goals <- tibble(
+  Season = c("2018-19", "2019-20", "2020-21", "2021-22", "2022-23", "2023-24"),
+  Goals  = c(41,       34,       33,       44,       64,       32)
+)
 
-# 1. READ the file (Instant!)
-sog_leaders_history <- read.csv("sog_leaders_history.csv")
-
-# 2. Add the URL column
-plot_data <- sog_leaders_history %>%
-  mutate(
-    year = as.numeric(substr(seasonId, 1, 4)),
-    # Use the NHL image server
-    headshot_url = paste0("[https://cms.nhl.bamgrid.com/images/headshots/current/168x168/](https://cms.nhl.bamgrid.com/images/headshots/current/168x168/)", playerId, ".jpg")
+# 2. Make the plot
+plot <- ggplot(mcdavid_goals, aes(x = Season, y = Goals)) +
+  # The Bars
+  geom_col(fill = "#FF4C00", width = 0.7) +  # Bright Oilers Orange
+  
+  # The Labels on top of bars
+  geom_text(aes(label = Goals), vjust = -0.5, fontface = "bold", size = 5) +
+  
+  # The Cool Minimal Look
+  theme_minimal() +
+  labs(
+    title = "Connor McDavid: Goals per Season",
+    subtitle = "The road to 64 goals and back",
+    x = "",
+    y = ""
+  ) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 16),
+    axis.text.y   = element_blank(),    # Hide y-axis numbers (cleaner)
+    panel.grid    = element_blank(),    # Remove grid lines
+    axis.text.x   = element_text(size = 11, face = "bold")
   )
 
-# 3. Create the Plot
-ggplot(plot_data, aes(x = year, y = shots)) +
-  geom_line(color = "lightgrey", size = 0.8) +
-  # This draws the faces
-  geom_image(aes(image = headshot_url), size = 0.08) + 
-  
-  # Make the chart look clean
-  scale_y_continuous(limits = c(0, NA), expand = expansion(mult = c(0, 0.1))) +
-  scale_x_continuous(breaks = seq(1960, 2024, by = 10)) +
-  labs(
-    title = "NHL Shots on Goal Leaders (Year by Year)",
-    subtitle = "Top SOG per season since 1959",
-    x = "Season",
-    y = "Shots on Goal"
-  ) +
-  theme_minimal()
+# 3. Show it
+print(plot)
 ```
