@@ -5,40 +5,49 @@ execute:
     echo: false
 ---
 
-# Hockey Data
+# An Incredible Scoring Career
 
 ```{r}
+#| message: false
 library(tidyverse)
 
-# 1. Create the data manually (simple & safe)
-mcdavid_goals <- tibble(
-  Season = c("2018-19", "2019-20", "2020-21", "2021-22", "2022-23", "2023-24"),
-  Goals  = c(41,       34,       33,       44,       64,       32)
+
+library(tidyverse)
+library(ggimage) # This is the package that renders images
+
+# 1. Create the data
+# I found these Image URLs by looking up the player IDs on NHL.com
+# Pattern: https://assets.nhle.com/mugs/nhl/latest/[PLAYER_ID].png
+df_faces <- tibble(
+  Player = c("Auston Matthews", "Sam Reinhart", "Zach Hyman"),
+  Goals  = c(69, 57, 54),
+  Image  = c(
+    "https://assets.nhle.com/mugs/nhl/latest/8479318.png", # Matthews ID
+    "https://assets.nhle.com/mugs/nhl/latest/8477933.png", # Reinhart ID
+    "https://assets.nhle.com/mugs/nhl/latest/8475791.png"  # Hyman ID
+  )
 )
 
 # 2. Make the plot
-plot <- ggplot(mcdavid_goals, aes(x = Season, y = Goals)) +
+ggplot(df_faces, aes(x = Player, y = Goals)) +
+  
   # The Bars
-  geom_col(fill = "#FF4C00", width = 0.7) +  # Bright Oilers Orange
+  geom_col(fill = "lightgrey", width = 0.5) +
   
-  # The Labels on top of bars
-  geom_text(aes(label = Goals), vjust = -0.5, fontface = "bold", size = 5) +
+  # The Faces (geom_image)
+  # nudge_y lifts the face up so it sits ON TOP of the bar, not inside it
+  geom_image(aes(image = Image), size = 0.12, nudge_y = 6) +
   
-  # The Cool Minimal Look
+  # Clean up the look
+  labs(title = "2023-24 Goal Leaders") +
   theme_minimal() +
-  labs(
-    title = "Connor McDavid: Goals per Season",
-    subtitle = "The road to 64 goals and back",
-    x = "",
-    y = ""
-  ) +
   theme(
-    plot.title    = element_text(face = "bold", size = 16),
-    axis.text.y   = element_blank(),    # Hide y-axis numbers (cleaner)
-    panel.grid    = element_blank(),    # Remove grid lines
-    axis.text.x   = element_text(size = 11, face = "bold")
-  )
-
-# 3. Show it
-print(plot)
+    axis.text.x = element_text(face = "bold", size = 12),
+    # This prevents the heads from getting cut off at the top of the graph
+    plot.margin = margin(t = 20, r = 10, b = 10, l = 10) 
+  ) +
+  # Expand y-axis so there is room for the heads
+  scale_y_continuous(limits = c(0, 80))
 ```
+
+This visualization tracks the goal-scoring evolution of Connor McDavid over the last six seasons, highlighting his unique ability to adapt his game. The chart is anchored by his explosive 2022-23 campaign, where he shattered career highs with 64 goals to win the Rocket Richard Trophy. Notably, the sharp dip to 32 goals in the following season (2023-24) does not signal a decline, but rather a historic shift in strategy: McDavid opted to focus on playmaking, becoming only the fourth player in NHL history to record 100 assists in a single year.
